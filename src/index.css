@@ -68,6 +68,160 @@ button {
   font-family: inherit;
 }
 
+/* Login page */
+.lk-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--lk-gradient);
+  padding: 24px;
+}
+
+.lk-login__card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--lk-card);
+  border-radius: var(--lk-radius-lg);
+  box-shadow: var(--lk-shadow-lg);
+  padding: 36px 32px;
+}
+
+.lk-login__brand {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.lk-login__brand h1 {
+  margin: 12px 0 4px;
+  font-size: 1.35rem;
+  color: var(--lk-ink);
+}
+
+.lk-login__brand p {
+  margin: 0;
+  color: var(--lk-slate);
+  font-size: 0.88rem;
+}
+
+.lk-login__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lk-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--lk-ink);
+}
+
+.lk-field input {
+  border: 1px solid var(--lk-border);
+  border-radius: var(--lk-radius-sm);
+  padding: 10px 12px;
+  font-size: 0.92rem;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.lk-field input:focus {
+  border-color: var(--lk-primary);
+  box-shadow: 0 0 0 3px var(--lk-primary-tint);
+}
+
+.lk-login__error {
+  background: var(--lk-danger-tint);
+  color: var(--lk-danger);
+  border-radius: var(--lk-radius-sm);
+  padding: 8px 12px;
+  font-size: 0.82rem;
+}
+
+.lk-login__btn {
+  background: var(--lk-gradient);
+  color: #fff;
+  border: none;
+  border-radius: var(--lk-radius-sm);
+  padding: 11px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--lk-shadow-md);
+  transition: opacity 0.15s;
+}
+
+.lk-login__btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.lk-login__btn:not(:disabled):hover {
+  opacity: 0.92;
+}
+
+/* Sidebar user + logout */
+.lk-sidebar__user {
+  padding: 14px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lk-sidebar__user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lk-sidebar__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--lk-primary-light);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.lk-sidebar__user-info strong {
+  display: block;
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.lk-sidebar__user-info span {
+  display: block;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.72rem;
+}
+
+.lk-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  border-radius: var(--lk-radius-sm);
+  padding: 9px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.lk-logout-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -886,6 +1040,31 @@ table.lk-table {
 /* wider modal for forms with more fields */
 .lk-modal:has(.lk-form) {
   max-width: 440px;
+}
+
+/* ---------- Additions: subcategory panel (fetched live via /categories?category_id=) ---------- */
+
+/* Body wrapper inside the subpanel so its own loader/error/empty states
+   don't sit flush against the panel header */
+.lk-subpanel__body {
+  padding: 4px 0 4px;
+}
+
+/* Compact the generic state block (loader / empty state) when it's used
+   inside the subpanel, so it doesn't feel as tall as the full-page ones */
+.lk-subpanel .lk-state {
+  padding: 40px 24px;
+}
+
+.lk-subpanel .lk-error-banner {
+  margin: 16px 22px 0;
+}
+
+/* Vendor pill: distinguishes vendor-assigned subcategories from
+   admin-created / unassigned ones (vendor_id null) */
+.lk-pill.vendor {
+  background: var(--lk-primary-tint);
+  color: var(--lk-primary-dark);
 }
 
 @media (max-width: 900px) {

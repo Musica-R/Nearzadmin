@@ -6,7 +6,7 @@ async function request(path, options = {}) {
     ...options,
   });
   const data = await res.json().catch(() => null);
-  if (!res.ok || (data && data.success === false)) {
+  if (!res.ok || (data && data.status === false)) {
     throw new Error((data && data.message) || `Request failed (${res.status})`);
   }
   return data;
@@ -21,7 +21,11 @@ function toForm(payload) {
 }
 
 export const api = {
+  adminLogin: ({ email, password }) =>
+    request("/admin/login", { method: "POST", body: toForm({ email, password }) }),
+
   dashboardCounts: () => request("/dashboard-list"),
+
   users: () => request("/user-list"),
   vendors: () => request("/all-vendors"),
   activities: () => request("/activities-all"),
@@ -38,6 +42,11 @@ export const api = {
 
   categoriesByType: (type) =>
     request(`/get_Categories_bytype?type=${encodeURIComponent(type)}`),
+
+  // NEW: fetch a single category (with its fresh sub_categories, including vendor_id)
+  // GET /api/categories?category_id=2
+  categoryDetail: (category_id) =>
+    request(`/categories?category_id=${category_id}`),
 
   addCategory: ({ name, image, type }) =>
     request("/categories", { method: "POST", body: toForm({ name, image, type }) }),

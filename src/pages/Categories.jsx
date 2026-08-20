@@ -1,10 +1,19 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback } from "react";
 import api, { CATEGORY_TYPES } from "../api/client";
 import Topbar from "../components/Topbar";
 import { Loader, EmptyState, ErrorBanner } from "../components/Common";
 
 const emptyCatForm = { id: null, name: "", type: CATEGORY_TYPES[0], image: null, status: 1 };
 const emptySubForm = { id: null, category_id: null, name: "", image: null, status: 1 };
+
+// Normalizes the /categories?category_id= response into a single category object,
+// regardless of whether the API wraps it in { data: [...] }, { data: {...} }, or
+// returns the array/object directly.
+function extractCategory(res) {
+  const payload = res && typeof res === "object" && "data" in res ? res.data : res;
+  if (Array.isArray(payload)) return payload[0] || null;
+  return payload || null;
+}
 
 export default function Categories({ onMenu }) {
   const [type, setType] = useState(CATEGORY_TYPES[0]);
@@ -14,6 +23,9 @@ export default function Categories({ onMenu }) {
   const [error, setError] = useState("");
 
   const [selectedId, setSelectedId] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [subLoading, setSubLoading] = useState(false);
+  const [subError, setSubError] = useState("");
 
   const [catForm, setCatForm] = useState(null);
   const [savingCat, setSavingCat] = useState(false);
@@ -38,15 +50,42 @@ export default function Categories({ onMenu }) {
     }
   }, []);
 
+  // Fetches a single category + its live sub_categories (with vendor_id) from
+  // GET /api/categories?category_id=<id>
+  const loadSubcategories = useCallback(async (categoryId) => {
+    setSubLoading(true);
+    setSubError("");
+    try {
+      const res = await api.categoryDetail(categoryId);
+      const cat = extractCategory(res);
+      setSelectedCategory(cat);
+      if (!cat) setSubError("Category not found.");
+    } catch (e) {
+      setSelectedCategory(null);
+      setSubError(e.message || "Couldn't load subcategories.");
+    } finally {
+      setSubLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     setSelectedId(null);
+    setSelectedCategory(null);
+    setSubError("");
     load(type, false);
   }, [type, load]);
 
-  const selected = useMemo(() => rows.find((c) => c.id === selectedId) || null, [rows, selectedId]);
-
   function selectCategory(cat) {
-    setSelectedId((prev) => (prev === cat.id ? null : cat.id));
+    setSelectedId((prev) => {
+      const next = prev === cat.id ? null : cat.id;
+      if (next) {
+        loadSubcategories(cat.id);
+      } else {
+        setSelectedCategory(null);
+        setSubError("");
+      }
+      return next;
+    });
   }
 
   function openAddCategory() {
@@ -72,8 +111,13 @@ export default function Categories({ onMenu }) {
       } else {
         await api.addCategory({ name: catForm.name, type: catForm.type, image: catForm.image });
       }
+      const editedId = catForm.id;
       setCatForm(null);
       await load(type, true);
+      // Keep the subpanel in sync if we just edited the currently open category
+      if (editedId && selectedId === editedId) {
+        loadSubcategories(editedId);
+      }
     } catch (e2) {
       setError(e2.message || "Couldn't save category.");
     } finally {
@@ -92,7 +136,7 @@ export default function Categories({ onMenu }) {
     e.preventDefault();
     if (!subForm) return;
     setSavingSub(true);
-    setError("");
+    setSubError("");
     try {
       if (subForm.id) {
         await api.updateSubcategory(subForm.id, {
@@ -108,10 +152,14 @@ export default function Categories({ onMenu }) {
           image: subForm.image,
         });
       }
+      const categoryId = subForm.category_id;
       setSubForm(null);
-      await load(type, true);
+      // Refresh the subpanel from the fresh endpoint, and quietly refresh the
+      // category grid in the background so the subcategory count badge updates.
+      await loadSubcategories(categoryId);
+      load(type, true);
     } catch (e2) {
-      setError(e2.message || "Couldn't save subcategory.");
+      setSubError(e2.message || "Couldn't save subcategory.");
     } finally {
       setSavingSub(false);
     }
@@ -120,18 +168,32 @@ export default function Categories({ onMenu }) {
   async function confirmDelete() {
     if (!confirmTarget) return;
     setDeleting(true);
-    setError("");
+    if (confirmTarget.kind === "category") {
+      setError("");
+    } else {
+      setSubError("");
+    }
     try {
       if (confirmTarget.kind === "category") {
         await api.deleteCategory(confirmTarget.id);
-        if (selectedId === confirmTarget.id) setSelectedId(null);
+        if (selectedId === confirmTarget.id) {
+          setSelectedId(null);
+          setSelectedCategory(null);
+        }
+        setConfirmTarget(null);
+        await load(type, true);
       } else {
         await api.deleteSubcategory(confirmTarget.id);
+        setConfirmTarget(null);
+        await loadSubcategories(confirmTarget.category_id);
+        load(type, true);
       }
-      setConfirmTarget(null);
-      await load(type, true);
     } catch (e) {
-      setError(e.message || "Couldn't delete.");
+      if (confirmTarget.kind === "category") {
+        setError(e.message || "Couldn't delete.");
+      } else {
+        setSubError(e.message || "Couldn't delete.");
+      }
     } finally {
       setDeleting(false);
     }
@@ -201,68 +263,101 @@ export default function Categories({ onMenu }) {
             </div>
           )}
 
-          {selected && (
+          {selectedId && (
             <div className="lk-subpanel">
               <div className="lk-panel__head">
                 <div>
-                  <h2>{selected.name} — subcategories</h2>
-                  <div className="lk-panel__head-sub">{selected.sub_categories?.length || 0} total</div>
+                  <h2>{selectedCategory ? `${selectedCategory.name} — subcategories` : "Subcategories"}</h2>
+                  <div className="lk-panel__head-sub">
+                    {subLoading
+                      ? "Loading…"
+                      : `${selectedCategory?.sub_categories?.length || 0} total`}
+                  </div>
                 </div>
-                <button className="lk-btn ghost" onClick={() => openAddSubcategory(selected)}>
+                <button
+                  className="lk-btn ghost"
+                  onClick={() => selectedCategory && openAddSubcategory(selectedCategory)}
+                  disabled={!selectedCategory}
+                >
                   + Add subcategory
                 </button>
               </div>
 
-              {!selected.sub_categories || selected.sub_categories.length === 0 ? (
-                <EmptyState message="No subcategories yet." />
-              ) : (
-                <div className="lk-table-wrap">
-                  <table className="lk-table">
-                    <thead>
-                      <tr>
-                        <th>Name</th>
-                        <th>Status</th>
-                        <th></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {selected.sub_categories.map((s) => (
-                        <tr key={s.id}>
-                          <td>
-                            <div className="lk-cell-entity">
-                              {s.image ? (
-                                <img className="lk-thumb" src={s.image} alt={s.name} />
-                              ) : (
-                                <div className="lk-thumb-fallback">{s.name?.[0] || "?"}</div>
-                              )}
-                              <strong>{s.name}</strong>
-                            </div>
-                          </td>
-                          <td>
-                            <span className={`lk-pill ${s.status ? "success" : "neutral"}`}>
-                              {s.status ? "Active" : "Inactive"}
-                            </span>
-                          </td>
-                          <td>
-                            <div className="lk-row-actions">
-                              <button className="lk-icon-btn link" title="Edit" onClick={() => openEditSubcategory(s)}>
-                                ✎
-                              </button>
-                              <button
-                                className="lk-icon-btn"
-                                title="Delete"
-                                onClick={() => setConfirmTarget({ kind: "subcategory", id: s.id, name: s.name })}
-                              >
-                                ✕
-                              </button>
-                            </div>
-                          </td>
+              <div className="lk-subpanel__body">
+                <ErrorBanner message={subError} />
+
+                {subLoading ? (
+                  <Loader />
+                ) : !selectedCategory || !selectedCategory.sub_categories || selectedCategory.sub_categories.length === 0 ? (
+                  <EmptyState message="No subcategories yet." />
+                ) : (
+                  <div className="lk-table-wrap">
+                    <table className="lk-table">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Vendor</th>
+                          <th>Status</th>
+                          <th></th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                      </thead>
+                      <tbody>
+                        {selectedCategory.sub_categories.map((s) => (
+                          <tr key={s.id}>
+                            <td>
+                              <div className="lk-cell-entity">
+                                {s.image ? (
+                                  <img className="lk-thumb" src={s.image} alt={s.name} />
+                                ) : (
+                                  <div className="lk-thumb-fallback">{s.name?.[0] || "?"}</div>
+                                )}
+                                <strong>{s.name}</strong>
+                              </div>
+                            </td>
+                            <td>
+                              {s.vendor_id ? (
+                                <span className="lk-pill vendor">Vendor #{s.vendor_id}</span>
+                              ) : (
+                                <span className="lk-pill neutral">Unassigned</span>
+                              )}
+                            </td>
+                            <td>
+                              <span className={`lk-pill ${s.status ? "success" : "neutral"}`}>
+                                {s.status ? "Active" : "Inactive"}
+                              </span>
+                            </td>
+                            <td>
+                              <div className="lk-row-actions">
+                                <button
+                                  className="lk-icon-btn link"
+                                  title="Edit"
+                                  onClick={() => openEditSubcategory(s)}
+                                >
+                                  ✎
+                                </button>
+                                <button
+                                  className="lk-icon-btn"
+                                  title="Delete"
+                                  onClick={() =>
+                                    setConfirmTarget({
+                                      kind: "subcategory",
+                                      id: s.id,
+                                      name: s.name,
+                                      category_id: selectedCategory.id,
+                                    })
+                                  }
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
