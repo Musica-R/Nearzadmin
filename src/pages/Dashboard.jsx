@@ -1,9 +1,71 @@
 import { useEffect, useState, useCallback } from "react";
-import { Users, UserCheck, UserX, Wrench, Dumbbell, Store, ArrowUpRight } from "lucide-react";
+import {
+  Users,
+  UserCheck,
+  UserX,
+  Wrench,
+  Dumbbell,
+  Store,
+  Tag,
+  ArrowUpRight,
+  ArrowRight,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import api from "../api/client";
-import { StatCard, Loader, ErrorBanner } from "../components/Common";
+import { Loader, ErrorBanner } from "../components/Common";
 import Topbar from "../components/Topbar";
+
+/* Small inline sparkline — no charting lib needed */
+function Sparkline({ points, color }) {
+  const path = points
+    .map((p, i) => `${(i / (points.length - 1)) * 160},${34 - p * 30}`)
+    .join(" ");
+  return (
+    <svg className="lk-stat-spark" width="100%" height="34" viewBox="0 0 160 34" preserveAspectRatio="none">
+      <polyline points={path} fill="none" stroke={color} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function StatCard({ icon: Icon, value, label, tint, iconColor, trend, points }) {
+  const up = trend >= 0;
+  return (
+    <div className="lk-stat-card">
+      <div className="lk-stat-card__top">
+        <div className="lk-stat-card__icon" style={{ background: tint, color: iconColor }}>
+          <Icon size={19} />
+        </div>
+        <span className={`lk-stat-badge ${up ? "up" : "down"}`}>
+          {up ? "↑" : "↓"} {Math.abs(trend)}%
+        </span>
+      </div>
+      <div className="lk-stat-card__value">{value}</div>
+      <div className="lk-stat-card__label">{label}</div>
+      <Sparkline points={points} color={iconColor} />
+    </div>
+  );
+}
+
+/* Quick access card with a photo, matching client's illustrated style */
+function QuickAccessCard({ to, icon: Icon, iconBg, image, title, desc }) {
+  return (
+    <Link to={to} className="lk-quick-card">
+      <div className="lk-quick-card__img">
+        <img src={image} alt={title} loading="lazy" />
+        <div className="lk-quick-card__icon" style={{ background: iconBg }}>
+          <Icon size={16} color="#fff" />
+        </div>
+      </div>
+      <div className="lk-quick-card__body">
+        <h3>{title}</h3>
+        <p>{desc}</p>
+      </div>
+      <div className="lk-quick-card__foot">
+        <ArrowUpRight size={15} color="var(--lk-primary)" />
+      </div>
+    </Link>
+  );
+}
 
 export default function Dashboard({ onMenu }) {
   const [data, setData] = useState(null);
@@ -31,20 +93,100 @@ export default function Dashboard({ onMenu }) {
 
   const cards = data
     ? [
-        { icon: Users, value: data.total_users, label: "Total users" },
-        { icon: UserCheck, value: data.active_users, label: "Active users" },
-        { icon: UserX, value: data.inactive_users, label: "Inactive users" },
-        { icon: Wrench, value: data.total_vendors, label: "Home service vendors" },
-        { icon: Dumbbell, value: data.total_activities, label: "Activities & classes" },
-        { icon: Store, value: data.total_near_stalls, label: "Near stalls" },
+        {
+          icon: Users,
+          value: data.total_users,
+          label: "Registered users",
+          tint: "var(--lk-primary-tint)",
+          iconColor: "var(--lk-primary-dark)",
+          trend: 8,
+          points: [0.6, 0.5, 0.7, 0.3, 0.45, 0.15, 0.4, 0.1, 0.25],
+        },
+        {
+          icon: UserCheck,
+          value: data.active_users,
+          label: "Currently active",
+          tint: "var(--lk-success-tint)",
+          iconColor: "var(--lk-success)",
+          trend: 12,
+          points: [0.65, 0.55, 0.6, 0.25, 0.5, 0.2, 0.4, 0.15, 0.2],
+        },
+        {
+          icon: UserX,
+          value: data.inactive_users,
+          label: "Not active",
+          tint: "#fdf1de",
+          iconColor: "#b8720c",
+          trend: 0,
+          points: [0.25, 0.35, 0.2, 0.45, 0.3, 0.5, 0.4, 0.55, 0.48],
+        },
+        {
+          icon: Wrench,
+          value: data.total_vendors,
+          label: "Home service providers",
+          tint: "#e8f0fe",
+          iconColor: "#2563d4",
+          trend: 5,
+          points: [0.55, 0.5, 0.65, 0.55, 0.75, 0.6, 0.8, 0.65, 0.85],
+        },
+        {
+          icon: Dumbbell,
+          value: data.total_activities,
+          label: "Total listed",
+          tint: "#fdeaf1",
+          iconColor: "#d3266e",
+          trend: 3,
+          points: [0.45, 0.35, 0.6, 0.3, 0.7, 0.4, 0.75, 0.55, 0.8],
+        },
       ]
     : [];
 
   const shortcuts = [
-    { to: "/users", label: "Manage users", desc: "View registered users and their status" },
-    { to: "/vendors", label: "Manage home services", desc: "Review and moderate service vendors" },
-    { to: "/activities", label: "Manage activities", desc: "Review classes, gyms & instructors" },
-    { to: "/near-stalls", label: "Manage near stalls", desc: "Review neighbourhood stalls" },
+    {
+      to: "/users",
+      label: "Manage Users",
+      desc: "View, edit and manage registered users",
+      icon: Users,
+      iconBg: "var(--lk-gradient)",
+      image:
+        "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=400&q=80",
+    },
+    {
+      to: "/vendors",
+      label: "Home Services",
+      desc: "Review and manage service vendors",
+      icon: Wrench,
+      iconBg: "#178a53",
+      image:
+        "https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=400&q=80",
+    },
+    {
+      to: "/activities",
+      label: "Activities",
+      desc: "Manage classes, gyms & instructors",
+      icon: Dumbbell,
+      iconBg: "#2563d4",
+      image:
+        "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=400&q=80",
+    },
+    {
+      to: "/near-stalls",
+      label: "Near Stalls",
+      desc: "Review nearby stalls and shops",
+      icon: Store,
+      iconBg: "#d3266e",
+      image:
+        "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=400&q=80",
+    },
+    {
+      to: "/categories",
+      label: "Categories",
+      desc: "Manage service categories",
+      icon: Tag,
+      iconBg: "#e08a1c",
+      image:
+        "https://images.unsplash.com/photo-1607082349566-187342175e2f?auto=format&fit=crop&w=400&q=80",
+    },
   ];
 
   return (
@@ -59,7 +201,7 @@ export default function Dashboard({ onMenu }) {
       <div className="lk-content">
         <ErrorBanner message={error} />
         {loading ? (
-          <Loader label="Loading dashboard\u2026" />
+          <Loader label="Loading dashboard…" />
         ) : (
           <>
             <div className="lk-stats-grid">
@@ -68,36 +210,46 @@ export default function Dashboard({ onMenu }) {
               ))}
             </div>
 
-            <div className="lk-panel">
-              <div className="lk-panel__head">
-                <div>
-                  <h2>Quick access</h2>
-                  <div className="lk-panel__head-sub">Jump straight into a listing type</div>
+            {/* Hero banner */}
+            <div className="lk-hero">
+              <div className="lk-hero__text">
+                <h2>
+                  Empowering Local Services Connecting <span>Communities</span>
+                </h2>
+                <p>
+                  Lokal helps you discover trusted local services, activities,
+                  and nearby stalls — all in one place.
+                </p>
+                <Link to="/vendors" className="lk-hero__btn">
+                  Explore Services <ArrowRight size={15} />
+                </Link>
+              </div>
+              <div className="lk-hero__art">
+                <img
+                  src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=700&q=80"
+                  alt="Local navigation and services"
+                />
+              </div>
+            </div>
+
+            <div className="lk-panel-plain">
+              <div className="lk-panel__head-plain">
+                <h2>Quick Access</h2>
+                <div className="lk-panel__head-sub">
+                  Manage and monitor your platform with ease
                 </div>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14, padding: 20 }}>
+              <div className="lk-quick-grid">
                 {shortcuts.map((s) => (
-                  <Link
+                  <QuickAccessCard
                     key={s.to}
                     to={s.to}
-                    style={{
-                      border: "1px solid var(--lk-border)",
-                      borderRadius: "var(--lk-radius-md)",
-                      padding: "16px 18px",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: 4,
-                      transition: "box-shadow .15s ease, border-color .15s ease",
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "var(--lk-shadow-md)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      <strong style={{ fontSize: 14 }}>{s.label}</strong>
-                      <ArrowUpRight size={15} color="var(--lk-primary)" />
-                    </div>
-                    <span style={{ fontSize: 12.5, color: "var(--lk-slate)" }}>{s.desc}</span>
-                  </Link>
+                    icon={s.icon}
+                    iconBg={s.iconBg}
+                    image={s.image}
+                    title={s.label}
+                    desc={s.desc}
+                  />
                 ))}
               </div>
             </div>
