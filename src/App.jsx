@@ -10,6 +10,7 @@ import Vendors from "./pages/Vendors";
 import Activities from "./pages/Activities";
 import NearStalls from "./pages/NearStalls";
 import Categories from "./pages/Categories";
+import AddVendor from "./pages/AddVendor";
 
 function AdminLayout({ children, onMenu }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -41,6 +42,7 @@ export default function App() {
                       <Route path="/" element={<Dashboard onMenu={openMenu} />} />
                       <Route path="/users" element={<Users onMenu={openMenu} />} />
                       <Route path="/vendors" element={<Vendors onMenu={openMenu} />} />
+                      <Route path="/vendors/add" element={<AddVendor onMenu={openMenu} />} />
                       <Route path="/activities" element={<Activities onMenu={openMenu} />} />
                       <Route path="/near-stalls" element={<NearStalls onMenu={openMenu} />} />
                       <Route path="/categories" element={<Categories onMenu={openMenu} />} />

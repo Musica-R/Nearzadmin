@@ -1259,11 +1259,6 @@ table.lk-table {
   margin: 16px 22px 0;
 }
 
-.lk-pill.vendor {
-  background: var(--lk-primary-tint);
-  color: var(--lk-primary-dark);
-}
-
 @media (max-width: 900px) {
   .lk-sidebar {
     position: fixed;

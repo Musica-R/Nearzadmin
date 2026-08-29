@@ -20,6 +20,14 @@ function toForm(payload) {
   return fd;
 }
 
+// Vendor registration hits a different endpoint per listing type — mirrors
+// the user-side vendorApi.js ENDPOINTS map.
+const REGISTER_ENDPOINTS = {
+  service: "/vendor/services",
+  activity: "/activities-register",
+  stall: "/near-stalls",
+};
+
 export const api = {
   adminLogin: ({ email, password }) =>
     request("/admin/login", { method: "POST", body: toForm({ email, password }) }),
@@ -30,15 +38,30 @@ export const api = {
   vendors: () => request("/all-vendors"),
   activities: () => request("/activities-all"),
   nearStalls: () => request("/near-stalls-all"),
+  allCategories: () => request("/categories"),
+  cities: () => request("/cities"),
+
+  // type: "service" | "activity" | "stall" — routes to the matching endpoint.
+  registerVendor: (type, formData) =>
+    request(REGISTER_ENDPOINTS[type], { method: "POST", body: formData }),
 
   deleteVendor: (vendor_id) =>
     request(`/vendor-delete?vendor_id=${vendor_id}`, { method: "GET" }),
 
+  updateVendor: (id, payload) =>
+    request(`/vendors-update?id=${id}`, { method: "POST", body: toForm(payload) }),
+
   deleteActivity: (activity_id) =>
     request(`/activity-delete?activity_id=${activity_id}`, { method: "GET" }),
 
+  updateActivity: (id, payload) =>
+    request(`/activities/update?id=${id}`, { method: "POST", body: toForm(payload) }),
+
   deleteNearStall: (stall_id) =>
     request(`/near-stall-delete?stall_id=${stall_id}`, { method: "GET" }),
+
+  updateNearStall: (id, payload) =>
+    request(`/near-stalls/update?id=${id}`, { method: "POST", body: toForm(payload) }),
 
   categoriesByType: (type) =>
     request(`/get_Categories_bytype?type=${encodeURIComponent(type)}`),

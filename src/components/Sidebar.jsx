@@ -8,9 +8,11 @@ import {
   Tags,
   X,
   LogOut,
+  FileText,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import "../Style/Sidebar.css";
+
 
 const NAV_ITEMS = [
   { to: "/", label: "Dashboard", icon: LayoutGrid, end: true },
@@ -18,6 +20,7 @@ const NAV_ITEMS = [
   { to: "/vendors", label: "Home Services", icon: Wrench },
   { to: "/activities", label: "Activities", icon: Dumbbell },
   { to: "/near-stalls", label: "Near Stalls", icon: Store },
+  { to: "/vendors/add", label: "Register Vendor", icon: FileText },
   { to: "/categories", label: "Categories", icon: Tags },
 ];
 
