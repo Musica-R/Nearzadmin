@@ -664,7 +664,7 @@ export default function Activities({ onMenu }) {
               <table className="lk-table">
                 <thead>
                   <tr>
-                    <th>Activity</th>
+                    <th>Activity / Business Name & Details</th>
                     <th>Category</th>
                     <th>Type</th>
                     <th>City</th>

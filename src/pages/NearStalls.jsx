@@ -701,7 +701,7 @@ export default function NearStalls({ onMenu }) {
               <table className="lk-table">
                 <thead>
                   <tr>
-                    <th className="shop-column">Shop</th>
+                    <th className="shop-column">Shop / Business Name & Details</th>
                     <th>Badge</th>
                     <th>City</th>
                     <th>Price</th>
