@@ -26,6 +26,7 @@ const REGISTER_ENDPOINTS = {
   service: "/vendor/services",
   activity: "/activities-register",
   stall: "/near-stalls",
+  job: "/jobs-store",
 };
 
 export const api = {
@@ -40,6 +41,14 @@ export const api = {
   nearStalls: () => request("/near-stalls-all"),
   allCategories: () => request("/categories"),
   cities: () => request("/cities"),
+
+  jobs: ({ page } = {}) => request(`/jobs${page ? `?page=${page}` : ""}`),
+
+updateJob: (id, payload) =>
+  request(`/jobs/update/${id}`, { method: "POST", body: toForm(payload) }),
+
+deleteJob: (id) =>
+  request(`/jobs/delete/${id}`, { method: "GET" }),
 
   // type: "service" | "activity" | "stall" — routes to the matching endpoint.
   registerVendor: (type, formData) =>

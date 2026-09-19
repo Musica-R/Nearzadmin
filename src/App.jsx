@@ -11,6 +11,7 @@ import Activities from "./pages/Activities";
 import NearStalls from "./pages/NearStalls";
 import Categories from "./pages/Categories";
 import AddVendor from "./pages/AddVendor";
+import JobList from "./pages/Joblist";
 
 function AdminLayout({ children, onMenu }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -46,6 +47,7 @@ export default function App() {
                       <Route path="/activities" element={<Activities onMenu={openMenu} />} />
                       <Route path="/near-stalls" element={<NearStalls onMenu={openMenu} />} />
                       <Route path="/categories" element={<Categories onMenu={openMenu} />} />
+                       <Route path="/jobs" element={<JobList onMenu={openMenu} />} />
                     </Routes>
                   )}
                 </AdminLayout>

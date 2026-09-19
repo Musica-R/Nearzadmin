@@ -10,6 +10,7 @@ import {
   IndianRupee,
   User,
   Phone,
+  Mail,
   MessageCircle,
   Tag,
   Briefcase,
@@ -24,6 +25,8 @@ import {
   UploadCloud,
   Contact,
   Layers,
+  GraduationCap,
+  Users,
 } from "lucide-react";
 import api from "../api/client";
 import "../Style/AddVendor.css";
@@ -32,6 +35,7 @@ const TABS = [
   { key: "service", label: "Service Vendor", icon: Store },
   { key: "activity", label: "Activity Provider", icon: Sparkles },
   { key: "stall", label: "Nearby Stall", icon: MapPin },
+  { key: "job", label: "Post a Job", icon: Briefcase },
 ];
 
 const ACTIVITY_TYPES = ["Learning & Training", "Sports & Fitness"];
@@ -48,6 +52,10 @@ const HERO_COPY = {
   stall: {
     title: "Add Nearby Stall",
     sub: "Create a nearby stall listing.",
+  },
+  job: {
+    title: "Add Job Listing",
+    sub: "Create a job posting on behalf of a business.",
   },
 };
 
@@ -81,6 +89,31 @@ const initialState = {
   shop_photo: null,
   shop_photo2: null,
   shop_photo3: null,
+
+  // Job fields
+  company_name: "",
+  job_title: "",
+  job_email: "",
+  job_mobile: "",
+  job_logo: null,
+  job_description: "",
+  job_type: "",
+  experience_min: "",
+  experience_max: "",
+  salary_min: "",
+  salary_max: "",
+  salary_type: "",
+  location: "",
+  work_mode: "",
+  skills: "",
+  qualification: "",
+  vacancies: "",
+  application_deadline: "",
+  gender: "",
+  shift: "",
+  benefits: "",
+  responsibilities: "",
+  requirements: "",
 };
 
 /* ---------------- Small building blocks ---------------- */
@@ -300,6 +333,34 @@ export default function AddVendor({ onMenu }) {
       if (form.shop_photo3) fd.append("shop_photo3", form.shop_photo3);
     }
 
+    if (form.type === "job") {
+      fd.append("company_name", form.company_name);
+      fd.append("job_title", form.job_title);
+      fd.append("email", form.job_email);
+      fd.append("mobile", form.job_mobile);
+      if (form.job_logo) fd.append("logo", form.job_logo);
+      fd.append("job_description", form.job_description);
+      fd.append("job_type", form.job_type);
+      if (form.experience_min !== "") fd.append("experience_min", form.experience_min);
+      if (form.experience_max !== "") fd.append("experience_max", form.experience_max);
+      if (form.salary_min !== "") fd.append("salary_min", form.salary_min);
+      if (form.salary_max !== "") fd.append("salary_max", form.salary_max);
+      fd.append("salary_type", form.salary_type);
+      fd.append("location", form.location);
+      fd.append("city_id", form.city_id);
+      fd.append("work_mode", form.work_mode);
+      fd.append("skills", form.skills);
+      fd.append("qualification", form.qualification);
+      if (form.vacancies !== "") fd.append("vacancies", form.vacancies);
+      if (form.application_deadline) fd.append("application_deadline", form.application_deadline);
+      fd.append("gender", form.gender);
+      fd.append("shift", form.shift);
+      fd.append("benefits", form.benefits);
+      fd.append("responsibilities", form.responsibilities);
+      fd.append("requirements", form.requirements);
+      fd.append("google_map_link", form.google_map_link);
+    }
+
     return fd;
   };
 
@@ -321,6 +382,8 @@ export default function AddVendor({ onMenu }) {
   const selectedCategory = homeServiceCategories.find(
     (c) => String(c.id) === String(form.category_id)
   );
+  const isJob = form.type === "job";
+  const isStall = form.type === "stall";
 
   return (
     <div className="av-page">
@@ -357,8 +420,12 @@ export default function AddVendor({ onMenu }) {
           <div className="av-success-icon">
             <CheckCircle2 size={34} />
           </div>
-          <h3>Listing created</h3>
-          <p className="text-muted">The listing has been added successfully.</p>
+          <h3>{isJob ? "Job posted" : "Listing created"}</h3>
+          <p className="text-muted">
+            {isJob
+              ? "The job listing has been added successfully."
+              : "The listing has been added successfully."}
+          </p>
           <button type="button" className="btn btn-primary" onClick={resetAll}>
             Add another
           </button>
@@ -372,10 +439,14 @@ export default function AddVendor({ onMenu }) {
                 index="01"
                 icon={Contact}
                 title="Basic details"
-                hint="Who the customer will be contacting"
+                hint={
+                  isJob
+                    ? "Who applicants will see and contact"
+                    : "Who the customer will be contacting"
+                }
               />
               <div className="av-grid">
-                {form.type !== "stall" && (
+                {!isJob && !isStall && (
                   <label>
                     <span className="av-label-text">
                       Full Name <span className="req">*</span>
@@ -392,21 +463,23 @@ export default function AddVendor({ onMenu }) {
                   </label>
                 )}
 
-                <label>
-                  <span className="av-label-text">
-                    Phone Number <span className="req">*</span>
-                  </span>
-                  <Field icon={Phone}>
-                    <input
-                      name="phone_number"
-                      value={form.phone_number}
-                      onChange={handleChange}
-                      required
-                      placeholder="9876543210"
-                      inputMode="numeric"
-                    />
-                  </Field>
-                </label>
+                {!isJob && (
+                  <label>
+                    <span className="av-label-text">
+                      Phone Number <span className="req">*</span>
+                    </span>
+                    <Field icon={Phone}>
+                      <input
+                        name="phone_number"
+                        value={form.phone_number}
+                        onChange={handleChange}
+                        required
+                        placeholder="9876543210"
+                        inputMode="numeric"
+                      />
+                    </Field>
+                  </label>
+                )}
 
                 {form.type === "service" && (
                   <label>
@@ -436,7 +509,7 @@ export default function AddVendor({ onMenu }) {
                   </label>
                 )}
 
-                {form.type === "stall" && (
+                {isStall && (
                   <label>
                     <span className="av-label-text">
                       Shop Name <span className="req">*</span>
@@ -453,246 +526,549 @@ export default function AddVendor({ onMenu }) {
                   </label>
                 )}
 
-                <label>
-                  <span className="av-label-text">WhatsApp Number</span>
-                  <Field icon={MessageCircle}>
-                    <input
-                      name="whatsapp_number"
-                      value={form.whatsapp_number}
-                      onChange={handleChange}
-                      placeholder="9876543210"
-                      inputMode="numeric"
-                    />
-                  </Field>
-                </label>
-              </div>
-            </section>
-
-            {/* -------- 02 Category / classification -------- */}
-            <section className="av-section">
-              <SectionHeader
-                index="02"
-                icon={Layers}
-                title={
-                  form.type === "service"
-                    ? "Category"
-                    : form.type === "activity"
-                    ? "Activity"
-                    : "Badge"
-                }
-                hint={
-                  form.type === "service"
-                    ? "What this vendor offers, and any specialities"
-                    : form.type === "activity"
-                    ? "The type and specific activity offered"
-                    : "How this stall appears to shoppers"
-                }
-              />
-              <div className="av-grid">
-                {form.type === "service" && (
-                  <>
-                    <label>
-                      <span className="av-label-text">
-                        Category <span className="req">*</span>
-                      </span>
-                      <Field icon={Tag}>
-                        <select name="category_id" value={form.category_id} onChange={handleChange} required>
-                          <option value="">Select category</option>
-                          {homeServiceCategories.map((c) => (
-                            <option key={c.id} value={c.id}>
-                              {c.name}
-                            </option>
-                          ))}
-                        </select>
-                      </Field>
-                    </label>
-
-                    <label className="av-span-2">
-                      <span className="av-label-text">Sub-category</span>
-                      {!form.category_id && <p className="av-hint">Select a category first</p>}
-                      {selectedCategory?.sub_categories?.length > 0 && (
-                        <div className="av-subcat-rows">
-                          {selectedCategory.sub_categories.map((sub) => {
-                            const active = form.subcategory_ids.includes(sub.id);
-                            return (
-                              <label key={sub.id} className={`av-subcat-row ${active ? "active" : ""}`}>
-                                <input
-                                  type="checkbox"
-                                  checked={active}
-                                  onChange={() => handleSubcategoryToggle(sub.id)}
-                                />
-                                <span className="av-subcat-tick">{active && <Check size={12} />}</span>
-                                <span className="av-subcat-row-label">{sub.name}</span>
-                              </label>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </label>
-
-                    <label className="av-span-2">
-                      <span className="av-label-text">Sub-category not listed? Type it here</span>
-                      <Field icon={Tag}>
-                        <input
-                          name="subcategory_name"
-                          value={form.subcategory_name}
-                          onChange={handleChange}
-                          onKeyDown={handleCustomSubcategoryKeyDown}
-                          placeholder="e.g. Aquarium Cleaning — press Enter to add"
-                        />
-                        <button type="button" className="av-tag-add-btn" onClick={handleAddCustomSubcategory}>
-                          Add
-                        </button>
-                      </Field>
-                      {form.subcategory_custom_names.length > 0 && (
-                        <div className="av-tag-list">
-                          {form.subcategory_custom_names.map((name) => (
-                            <span key={name} className="av-tag">
-                              {name}
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveCustomSubcategory(name)}
-                                aria-label={`Remove ${name}`}
-                              >
-                                <X size={12} />
-                              </button>
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </label>
-                  </>
-                )}
-
-                {form.type === "activity" && (
-                  <>
-                    <label>
-                      <span className="av-label-text">
-                        Activity Type <span className="req">*</span>
-                      </span>
-                      <Field icon={Sparkles}>
-                        <select name="activity_type" value={form.activity_type} onChange={handleActivityTypeChange} required>
-                          <option value="">Select activity type</option>
-                          {ACTIVITY_TYPES.map((t) => (
-                            <option key={t} value={t}>
-                              {t}
-                            </option>
-                          ))}
-                        </select>
-                      </Field>
-                    </label>
-                    <label>
-                      <span className="av-label-text">
-                        Activity <span className="req">*</span>
-                      </span>
-                      <Field icon={ListChecks}>
-                        <select
-                          name="activity_category_id"
-                          value={form.activity_category_id}
-                          onChange={handleActivityCategoryChange}
-                          required
-                          disabled={!form.activity_type || activityCategoriesLoading}
-                        >
-                          <option value="">
-                            {!form.activity_type
-                              ? "Select activity type first"
-                              : activityCategoriesLoading
-                              ? "Loading..."
-                              : "Select activity"}
-                          </option>
-                          {activityCategories.map((c) => (
-                            <option key={c.id} value={c.id}>
-                              {c.name}
-                            </option>
-                          ))}
-                        </select>
-                      </Field>
-                    </label>
-                  </>
-                )}
-
-                {form.type === "stall" && (
+                {!isJob && (
                   <label>
-                    <span className="av-label-text">Badge</span>
-                    <Field icon={Award}>
-                      <select name="badge" value={form.badge} onChange={handleChange}>
-                        <option value="Verified">Verified</option>
-                        <option value="Popular">Popular</option>
-                        <option value="New">New</option>
-                      </select>
-                    </Field>
-                  </label>
-                )}
-              </div>
-            </section>
-
-            {/* -------- 03 Pricing, experience & availability -------- */}
-            <section className="av-section">
-              <SectionHeader
-                index="03"
-                icon={CalendarDays}
-                title="Pricing & availability"
-                hint="Starting price and when customers can reach them"
-              />
-              <div className="av-grid">
-                {form.type !== "stall" && (
-                  <label>
-                    <span className="av-label-text">Experience</span>
-                    <Field icon={Briefcase}>
+                    <span className="av-label-text">WhatsApp Number</span>
+                    <Field icon={MessageCircle}>
                       <input
-                        name="experience"
-                        value={form.experience}
+                        name="whatsapp_number"
+                        value={form.whatsapp_number}
                         onChange={handleChange}
-                        placeholder={form.type === "service" ? "e.g. 5 Years" : "e.g. 3 Years"}
+                        placeholder="9876543210"
+                        inputMode="numeric"
                       />
                     </Field>
                   </label>
                 )}
-                <label>
-                  <span className="av-label-text">
-                    Price (starting from) <span className="req">*</span>
-                  </span>
-                  <Field icon={IndianRupee}>
-                    <input
-                      type="number"
-                      min="0"
-                      step="1"
-                      name="price"
-                      value={form.price}
-                      onChange={handleChange}
-                      required
-                      placeholder={form.type === "stall" ? "e.g. 49" : "e.g. 299"}
-                    />
-                  </Field>
-                </label>
 
-                {form.type !== "stall" && (
+                {isJob && (
+                  <>
+                    <label>
+                      <span className="av-label-text">
+                        Company Name <span className="req">*</span>
+                      </span>
+                      <Field icon={Building2}>
+                        <input
+                          name="company_name"
+                          value={form.company_name}
+                          onChange={handleChange}
+                          required
+                          placeholder="e.g. Kavin Electronics"
+                        />
+                      </Field>
+                    </label>
+                    <label>
+                      <span className="av-label-text">
+                        Job Title <span className="req">*</span>
+                      </span>
+                      <Field icon={Briefcase}>
+                        <input
+                          name="job_title"
+                          value={form.job_title}
+                          onChange={handleChange}
+                          required
+                          placeholder="e.g. Sales Executive"
+                        />
+                      </Field>
+                    </label>
+                    <label>
+                      <span className="av-label-text">Email</span>
+                      <Field icon={Mail}>
+                        <input
+                          type="email"
+                          name="job_email"
+                          value={form.job_email}
+                          onChange={handleChange}
+                          placeholder="e.g. hr@company.com"
+                        />
+                      </Field>
+                    </label>
+                    <label>
+                      <span className="av-label-text">Mobile Number</span>
+                      <Field icon={Phone}>
+                        <input
+                          name="job_mobile"
+                          value={form.job_mobile}
+                          onChange={handleChange}
+                          placeholder="9876543210"
+                          inputMode="numeric"
+                        />
+                      </Field>
+                    </label>
+                  </>
+                )}
+              </div>
+            </section>
+
+            {/* -------- 02 Category / classification -------- */}
+            {!isJob && (
+              <section className="av-section">
+                <SectionHeader
+                  index="02"
+                  icon={Layers}
+                  title={
+                    form.type === "service"
+                      ? "Category"
+                      : form.type === "activity"
+                      ? "Activity"
+                      : "Badge"
+                  }
+                  hint={
+                    form.type === "service"
+                      ? "What this vendor offers, and any specialities"
+                      : form.type === "activity"
+                      ? "The type and specific activity offered"
+                      : "How this stall appears to shoppers"
+                  }
+                />
+                <div className="av-grid">
+                  {form.type === "service" && (
+                    <>
+                      <label>
+                        <span className="av-label-text">
+                          Category <span className="req">*</span>
+                        </span>
+                        <Field icon={Tag}>
+                          <select name="category_id" value={form.category_id} onChange={handleChange} required>
+                            <option value="">Select category</option>
+                            {homeServiceCategories.map((c) => (
+                              <option key={c.id} value={c.id}>
+                                {c.name}
+                              </option>
+                            ))}
+                          </select>
+                        </Field>
+                      </label>
+
+                      <label className="av-span-2">
+                        <span className="av-label-text">Sub-category</span>
+                        {!form.category_id && <p className="av-hint">Select a category first</p>}
+                        {selectedCategory?.sub_categories?.length > 0 && (
+                          <div className="av-subcat-rows">
+                            {selectedCategory.sub_categories.map((sub) => {
+                              const active = form.subcategory_ids.includes(sub.id);
+                              return (
+                                <label key={sub.id} className={`av-subcat-row ${active ? "active" : ""}`}>
+                                  <input
+                                    type="checkbox"
+                                    checked={active}
+                                    onChange={() => handleSubcategoryToggle(sub.id)}
+                                  />
+                                  <span className="av-subcat-tick">{active && <Check size={12} />}</span>
+                                  <span className="av-subcat-row-label">{sub.name}</span>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </label>
+
+                      <label className="av-span-2">
+                        <span className="av-label-text">Sub-category not listed? Type it here</span>
+                        <Field icon={Tag}>
+                          <input
+                            name="subcategory_name"
+                            value={form.subcategory_name}
+                            onChange={handleChange}
+                            onKeyDown={handleCustomSubcategoryKeyDown}
+                            placeholder="e.g. Aquarium Cleaning — press Enter to add"
+                          />
+                          <button type="button" className="av-tag-add-btn" onClick={handleAddCustomSubcategory}>
+                            Add
+                          </button>
+                        </Field>
+                        {form.subcategory_custom_names.length > 0 && (
+                          <div className="av-tag-list">
+                            {form.subcategory_custom_names.map((name) => (
+                              <span key={name} className="av-tag">
+                                {name}
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveCustomSubcategory(name)}
+                                  aria-label={`Remove ${name}`}
+                                >
+                                  <X size={12} />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </label>
+                    </>
+                  )}
+
+                  {form.type === "activity" && (
+                    <>
+                      <label>
+                        <span className="av-label-text">
+                          Activity Type <span className="req">*</span>
+                        </span>
+                        <Field icon={Sparkles}>
+                          <select name="activity_type" value={form.activity_type} onChange={handleActivityTypeChange} required>
+                            <option value="">Select activity type</option>
+                            {ACTIVITY_TYPES.map((t) => (
+                              <option key={t} value={t}>
+                                {t}
+                              </option>
+                            ))}
+                          </select>
+                        </Field>
+                      </label>
+                      <label>
+                        <span className="av-label-text">
+                          Activity <span className="req">*</span>
+                        </span>
+                        <Field icon={ListChecks}>
+                          <select
+                            name="activity_category_id"
+                            value={form.activity_category_id}
+                            onChange={handleActivityCategoryChange}
+                            required
+                            disabled={!form.activity_type || activityCategoriesLoading}
+                          >
+                            <option value="">
+                              {!form.activity_type
+                                ? "Select activity type first"
+                                : activityCategoriesLoading
+                                ? "Loading..."
+                                : "Select activity"}
+                            </option>
+                            {activityCategories.map((c) => (
+                              <option key={c.id} value={c.id}>
+                                {c.name}
+                              </option>
+                            ))}
+                          </select>
+                        </Field>
+                      </label>
+                    </>
+                  )}
+
+                  {isStall && (
+                    <label>
+                      <span className="av-label-text">Badge</span>
+                      <Field icon={Award}>
+                        <select name="badge" value={form.badge} onChange={handleChange}>
+                          <option value="Verified">Verified</option>
+                          <option value="Popular">Popular</option>
+                          <option value="New">New</option>
+                        </select>
+                      </Field>
+                    </label>
+                  )}
+                </div>
+              </section>
+            )}
+
+            {/* -------- Job details -------- */}
+            {isJob && (
+              <section className="av-section">
+                <SectionHeader
+                  index="02"
+                  icon={Briefcase}
+                  title="Job details"
+                  hint="Role type, experience, salary and other requirements"
+                />
+                <div className="av-grid">
                   <label>
-                    <span className="av-label-text">Availability</span>
-                    <Field icon={CalendarDays}>
-                      <select name="availability_type" value={form.availability_type} onChange={handleChange}>
-                        <option value="all_days">All Days</option>
-                        <option value="weekdays">Weekdays Only</option>
-                        <option value="weekends">Weekends Only</option>
+                    <span className="av-label-text">
+                      Job Type <span className="req">*</span>
+                    </span>
+                    <Field icon={Tag}>
+                      <select name="job_type" value={form.job_type} onChange={handleChange} required>
+                        <option value="">Select job type</option>
+                        <option value="Full-time">Full-time</option>
+                        <option value="Part-time">Part-time</option>
+                        <option value="Internship">Internship</option>
+                        <option value="Contract">Contract</option>
+                        <option value="Freelance">Freelance</option>
                       </select>
                     </Field>
                   </label>
-                )}
+                  <label>
+                    <span className="av-label-text">Work Mode</span>
+                    <Field icon={MapPin}>
+                      <select name="work_mode" value={form.work_mode} onChange={handleChange}>
+                        <option value="">Select work mode</option>
+                        <option value="On-site">On-site</option>
+                        <option value="Remote">Remote</option>
+                        <option value="Hybrid">Hybrid</option>
+                      </select>
+                    </Field>
+                  </label>
 
-                <label>
-                  <span className="av-label-text">Working From</span>
-                  <Field icon={Clock}>
-                    <input type="time" name="working_from" value={form.working_from} onChange={handleChange} />
-                  </Field>
-                </label>
-                <label>
-                  <span className="av-label-text">Working To</span>
-                  <Field icon={Clock}>
-                    <input type="time" name="working_to" value={form.working_to} onChange={handleChange} />
-                  </Field>
-                </label>
-              </div>
-            </section>
+                  <label>
+                    <span className="av-label-text">Experience Min (years)</span>
+                    <Field icon={Briefcase}>
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        name="experience_min"
+                        value={form.experience_min}
+                        onChange={handleChange}
+                        placeholder="e.g. 1"
+                      />
+                    </Field>
+                  </label>
+                  <label>
+                    <span className="av-label-text">Experience Max (years)</span>
+                    <Field icon={Briefcase}>
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        name="experience_max"
+                        value={form.experience_max}
+                        onChange={handleChange}
+                        placeholder="e.g. 5"
+                      />
+                    </Field>
+                  </label>
+
+                  <label>
+                    <span className="av-label-text">Salary Min</span>
+                    <Field icon={IndianRupee}>
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        name="salary_min"
+                        value={form.salary_min}
+                        onChange={handleChange}
+                        placeholder="e.g. 15000"
+                      />
+                    </Field>
+                  </label>
+                  <label>
+                    <span className="av-label-text">Salary Max</span>
+                    <Field icon={IndianRupee}>
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        name="salary_max"
+                        value={form.salary_max}
+                        onChange={handleChange}
+                        placeholder="e.g. 25000"
+                      />
+                    </Field>
+                  </label>
+
+                  <label>
+                    <span className="av-label-text">Salary Type</span>
+                    <Field icon={IndianRupee}>
+                      <select name="salary_type" value={form.salary_type} onChange={handleChange}>
+                        <option value="">Select salary type</option>
+                        <option value="Monthly">Monthly</option>
+                        <option value="Yearly">Yearly</option>
+                        <option value="Hourly">Hourly</option>
+                        <option value="Negotiable">Negotiable</option>
+                      </select>
+                    </Field>
+                  </label>
+                  <label>
+                    <span className="av-label-text">Qualification</span>
+                    <Field icon={GraduationCap}>
+                      <input
+                        name="qualification"
+                        value={form.qualification}
+                        onChange={handleChange}
+                        placeholder="e.g. Any Degree"
+                      />
+                    </Field>
+                  </label>
+
+                  <label>
+                    <span className="av-label-text">Skills</span>
+                    <Field icon={Tag}>
+                      <input
+                        name="skills"
+                        value={form.skills}
+                        onChange={handleChange}
+                        placeholder="e.g. Communication, MS Excel"
+                      />
+                    </Field>
+                  </label>
+                  <label>
+                    <span className="av-label-text">Vacancies</span>
+                    <Field icon={Users}>
+                      <input
+                        type="number"
+                        min="1"
+                        step="1"
+                        name="vacancies"
+                        value={form.vacancies}
+                        onChange={handleChange}
+                        placeholder="e.g. 2"
+                      />
+                    </Field>
+                  </label>
+
+                  <label>
+                    <span className="av-label-text">Application Deadline</span>
+                    <Field icon={CalendarDays}>
+                      <input
+                        type="date"
+                        name="application_deadline"
+                        value={form.application_deadline}
+                        onChange={handleChange}
+                      />
+                    </Field>
+                  </label>
+                  <label>
+                    <span className="av-label-text">Gender Preference</span>
+                    <Field icon={User}>
+                      <select name="gender" value={form.gender} onChange={handleChange}>
+                        <option value="">Any</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                      </select>
+                    </Field>
+                  </label>
+
+                  <label>
+                    <span className="av-label-text">Shift</span>
+                    <Field icon={Clock}>
+                      <select name="shift" value={form.shift} onChange={handleChange}>
+                        <option value="">Select shift</option>
+                        <option value="Day">Day</option>
+                        <option value="Night">Night</option>
+                        <option value="Rotational">Rotational</option>
+                      </select>
+                    </Field>
+                  </label>
+                </div>
+              </section>
+            )}
+
+            {/* -------- 03 Pricing, experience & availability / Job description -------- */}
+            {!isJob ? (
+              <section className="av-section">
+                <SectionHeader
+                  index="03"
+                  icon={CalendarDays}
+                  title="Pricing & availability"
+                  hint="Starting price and when customers can reach them"
+                />
+                <div className="av-grid">
+                  {!isStall && (
+                    <label>
+                      <span className="av-label-text">Experience</span>
+                      <Field icon={Briefcase}>
+                        <input
+                          name="experience"
+                          value={form.experience}
+                          onChange={handleChange}
+                          placeholder={form.type === "service" ? "e.g. 5 Years" : "e.g. 3 Years"}
+                        />
+                      </Field>
+                    </label>
+                  )}
+                  <label>
+                    <span className="av-label-text">
+                      Price (starting from) <span className="req">*</span>
+                    </span>
+                    <Field icon={IndianRupee}>
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        name="price"
+                        value={form.price}
+                        onChange={handleChange}
+                        required
+                        placeholder={isStall ? "e.g. 49" : "e.g. 299"}
+                      />
+                    </Field>
+                  </label>
+
+                  {!isStall && (
+                    <label>
+                      <span className="av-label-text">Availability</span>
+                      <Field icon={CalendarDays}>
+                        <select name="availability_type" value={form.availability_type} onChange={handleChange}>
+                          <option value="all_days">All Days</option>
+                          <option value="weekdays">Weekdays Only</option>
+                          <option value="weekends">Weekends Only</option>
+                        </select>
+                      </Field>
+                    </label>
+                  )}
+
+                  <label>
+                    <span className="av-label-text">Working From</span>
+                    <Field icon={Clock}>
+                      <input type="time" name="working_from" value={form.working_from} onChange={handleChange} />
+                    </Field>
+                  </label>
+                  <label>
+                    <span className="av-label-text">Working To</span>
+                    <Field icon={Clock}>
+                      <input type="time" name="working_to" value={form.working_to} onChange={handleChange} />
+                    </Field>
+                  </label>
+                </div>
+              </section>
+            ) : (
+              <section className="av-section">
+                <SectionHeader
+                  index="03"
+                  icon={ListChecks}
+                  title="Description & requirements"
+                  hint="Role details, benefits and what the candidate needs"
+                />
+                <div className="av-grid">
+                  <label className="av-span-2">
+                    <span className="av-label-text">
+                      Job Description <span className="req">*</span>
+                    </span>
+                    <textarea
+                      className="av-textarea"
+                      name="job_description"
+                      value={form.job_description}
+                      onChange={handleChange}
+                      required
+                      rows={4}
+                      placeholder="Describe the role, day-to-day tasks, etc."
+                    />
+                  </label>
+                  <label className="av-span-2">
+                    <span className="av-label-text">Benefits</span>
+                    <textarea
+                      className="av-textarea"
+                      name="benefits"
+                      value={form.benefits}
+                      onChange={handleChange}
+                      rows={3}
+                      placeholder="e.g. PF, Health Insurance, Incentives"
+                    />
+                  </label>
+                  <label className="av-span-2">
+                    <span className="av-label-text">Responsibilities</span>
+                    <textarea
+                      className="av-textarea"
+                      name="responsibilities"
+                      value={form.responsibilities}
+                      onChange={handleChange}
+                      rows={3}
+                      placeholder="Key responsibilities for this role"
+                    />
+                  </label>
+                  <label className="av-span-2">
+                    <span className="av-label-text">Requirements</span>
+                    <textarea
+                      className="av-textarea"
+                      name="requirements"
+                      value={form.requirements}
+                      onChange={handleChange}
+                      rows={3}
+                      placeholder="Must-have requirements for applicants"
+                    />
+                  </label>
+                </div>
+              </section>
+            )}
 
             {/* -------- 04 Location -------- */}
             <section className="av-section">
@@ -700,20 +1076,24 @@ export default function AddVendor({ onMenu }) {
                 index="04"
                 icon={MapPin}
                 title="Location"
-                hint="Where customers will find or visit this listing"
+                hint={
+                  isJob
+                    ? "Where the role is based"
+                    : "Where customers will find or visit this listing"
+                }
               />
               <div className="av-grid">
                 <label className="av-span-2">
                   <span className="av-label-text">
-                    Address Line <span className="req">*</span>
+                    {isJob ? "Location" : "Address Line"} <span className="req">*</span>
                   </span>
                   <Field icon={MapPin}>
                     <input
-                      name="address_line1"
-                      value={form.address_line1}
+                      name={isJob ? "location" : "address_line1"}
+                      value={isJob ? form.location : form.address_line1}
                       onChange={handleChange}
                       required
-                      placeholder="Address"
+                      placeholder={isJob ? "e.g. Anna Nagar, Chennai" : "Address"}
                     />
                   </Field>
                 </label>
@@ -733,21 +1113,24 @@ export default function AddVendor({ onMenu }) {
                     </select>
                   </Field>
                 </label>
-                <label>
-                  <span className="av-label-text">
-                    Pincode <span className="req">*</span>
-                  </span>
-                  <Field icon={Hash}>
-                    <input
-                      name="pincode"
-                      value={form.pincode}
-                      onChange={handleChange}
-                      required
-                      placeholder="637102"
-                      inputMode="numeric"
-                    />
-                  </Field>
-                </label>
+
+                {!isJob && (
+                  <label>
+                    <span className="av-label-text">
+                      Pincode <span className="req">*</span>
+                    </span>
+                    <Field icon={Hash}>
+                      <input
+                        name="pincode"
+                        value={form.pincode}
+                        onChange={handleChange}
+                        required
+                        placeholder="637102"
+                        inputMode="numeric"
+                      />
+                    </Field>
+                  </label>
+                )}
 
                 <label className="av-span-2">
                   <span className="av-label-text">Google Map Link</span>
@@ -769,10 +1152,16 @@ export default function AddVendor({ onMenu }) {
                 index="05"
                 icon={ImagePlus}
                 title="Photos"
-                hint={form.type === "stall" ? "At least one clear photo of the stall" : "Optional, but builds customer trust"}
+                hint={
+                  isJob
+                    ? "Optional company logo"
+                    : isStall
+                    ? "At least one clear photo of the stall"
+                    : "Optional, but builds customer trust"
+                }
               />
               <div className="av-grid">
-                {form.type !== "stall" && (
+                {!isStall && !isJob && (
                   <div className="av-span-2">
                     <FileField
                       label="Profile Photo (optional)"
@@ -783,7 +1172,18 @@ export default function AddVendor({ onMenu }) {
                   </div>
                 )}
 
-                {form.type === "stall" && (
+                {isJob && (
+                  <div className="av-span-2">
+                    <FileField
+                      label="Company Logo (optional)"
+                      name="job_logo"
+                      file={form.job_logo}
+                      onChange={handleFileChange}
+                    />
+                  </div>
+                )}
+
+                {isStall && (
                   <>
                     <FileField
                       label="Shop Photo"
@@ -821,7 +1221,7 @@ export default function AddVendor({ onMenu }) {
                 Reset
               </button>
               <button type="submit" className="btn btn-primary av-submit" disabled={loading}>
-                {loading ? "Submitting…" : "Create Listing"}
+                {loading ? "Submitting…" : isJob ? "Post Job" : "Create Listing"}
               </button>
             </div>
           </div>
