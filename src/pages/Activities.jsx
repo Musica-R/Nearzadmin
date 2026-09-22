@@ -639,7 +639,7 @@ export default function Activities({ onMenu }) {
     <>
       <Topbar
         title="Activities"
-        subtitle="Classes, sports & fitness centres on Lokal"
+        subtitle="Classes, sports & fitness centres on Thozhaa"
         onMenu={onMenu}
         onRefresh={() => load(true, page)}
         refreshing={refreshing}
@@ -761,7 +761,7 @@ export default function Activities({ onMenu }) {
         open={!!target}
         busy={busy}
         title="Delete this activity?"
-        description={target ? `"${target.shop_center_name}" will be permanently removed from Lokal. This can't be undone.` : ""}
+        description={target ? `"${target.shop_center_name}" will be permanently removed from Thozhaa. This can't be undone.` : ""}
         onCancel={() => !busy && setTarget(null)}
         onConfirm={confirmDelete}
       />

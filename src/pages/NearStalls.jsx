@@ -797,7 +797,7 @@ export default function NearStalls({ onMenu }) {
         open={!!target}
         busy={busy}
         title="Delete this stall?"
-        description={target ? `"${target.shop_name}" will be permanently removed from Lokal. This can't be undone.` : ""}
+        description={target ? `"${target.shop_name}" will be permanently removed from Thozhaa. This can't be undone.` : ""}
         onCancel={() => !busy && setTarget(null)}
         onConfirm={confirmDelete}
       />

@@ -1,17 +1,24 @@
 @import url("https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap");
 
 :root {
-  --lk-primary: #9b20d0;
-  --lk-primary-dark: #7920b4;
-  --lk-primary-light: #c02de5;
-  --lk-primary-tint: #f7ebfc;
-  --lk-gradient: linear-gradient(145deg, #7920b4 0%, #9b20d0 50%, #c02de5 100%);
+  /* NAVY — primary/major color, used throughout */
+  --lk-primary: #14213d;
+  --lk-primary-dark: #0d1826;
+  --lk-primary-light: #2a3b64;
+  --lk-primary-tint: #eef1f8;
+  --lk-gradient: linear-gradient(145deg, #0d1826 0%, #14213d 50%, #2a3b64 100%);
 
-  --lk-ink: #1c1229;
-  --lk-slate: #6e6480;
-  --lk-slate-light: #9a91ab;
-  --lk-border: #ece5f2;
-  --lk-bg: #faf8fc;
+  /* ORANGE — accent only, used sparingly */
+  --lk-accent: #ff6b35;
+  --lk-accent-dark: #e5502a;
+  --lk-accent-light: #ff8c5f;
+  --lk-accent-tint: #fff1ec;
+
+  --lk-ink: #14213d;
+  --lk-slate: #5c6478;
+  --lk-slate-light: #97a0b3;
+  --lk-border: #e4e8f0;
+  --lk-bg: #f7f8fb;
   --lk-card: #ffffff;
 
   --lk-success: #148a53;
@@ -24,9 +31,9 @@
   --lk-radius-sm: 8px;
   --lk-radius-md: 14px;
   --lk-radius-lg: 20px;
-  --lk-shadow-sm: 0 1px 2px rgba(28, 18, 41, 0.06);
-  --lk-shadow-md: 0 8px 24px -8px rgba(121, 32, 180, 0.18);
-  --lk-shadow-lg: 0 20px 45px -18px rgba(121, 32, 180, 0.28);
+  --lk-shadow-sm: 0 1px 2px rgba(20, 33, 61, 0.06);
+  --lk-shadow-md: 0 8px 24px -8px rgba(20, 33, 61, 0.22);
+  --lk-shadow-lg: 0 20px 45px -18px rgba(20, 33, 61, 0.32);
 
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color-scheme: light;
@@ -228,7 +235,7 @@ button {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #e4d8ec;
+  background: #dbe0ea;
   border-radius: 8px;
 }
 
@@ -268,7 +275,7 @@ button {
 .lk-sidebar {
   width: 252px;
   flex-shrink: 0;
-  background: #1c1229;
+  background: #14213d;
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -307,7 +314,7 @@ button {
 
 .lk-sidebar__brand-text span {
   font-size: 11px;
-  color: #a996c2;
+  color: #8a93ab;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   margin-top: 2px;
@@ -328,7 +335,7 @@ button {
   gap: 12px;
   padding: 10px 12px;
   border-radius: var(--lk-radius-sm);
-  color: #c9bedb;
+  color: #b7bfd1;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -346,9 +353,9 @@ button {
 }
 
 .lk-navitem.active {
-  background: var(--lk-gradient);
+  background: var(--lk-primary-light);
   color: #fff;
-  box-shadow: 0 6px 16px -6px rgba(155, 32, 208, 0.7);
+  box-shadow: inset 3px 0 0 var(--lk-accent);
 }
 
 .lk-navitem__count {
@@ -361,14 +368,14 @@ button {
 }
 
 .lk-navitem.active .lk-navitem__count {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .lk-sidebar__foot {
   padding: 16px 20px 22px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   font-size: 11px;
-  color: #7c6f95;
+  color: #5c6478;
 }
 
 /* ---------- Topbar ---------- */
@@ -382,7 +389,7 @@ button {
   justify-content: space-between;
   gap: 20px;
   padding: 18px 32px;
-  background: rgba(250, 248, 252, 0.85);
+  background: rgba(247, 248, 251, 0.85);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--lk-border);
 }
@@ -472,13 +479,7 @@ button {
 }
 
 .lk-stat-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--lk-gradient);
+  display: none;
 }
 
 .lk-stat-card__top {
@@ -493,7 +494,7 @@ button {
   height: 34px;
   border-radius: 10px;
   background: var(--lk-primary-tint);
-  color: var(--lk-primary-dark);
+  color: var(--lk-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -511,6 +512,31 @@ button {
   font-size: 12.5px;
   color: var(--lk-slate);
   font-weight: 500;
+}
+
+.lk-stat-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.lk-stat-badge.up {
+  background: var(--lk-success-tint);
+  color: var(--lk-success);
+}
+
+.lk-stat-badge.down {
+  background: var(--lk-danger-tint);
+  color: var(--lk-danger);
+}
+
+.lk-stat-spark {
+  margin-top: 12px;
+  display: block;
 }
 
 /* ---------- Panel / table ---------- */
@@ -664,7 +690,7 @@ table.lk-table {
   font-size: 11.5px;
   font-weight: 600;
   background: var(--lk-primary-tint);
-  color: var(--lk-primary-dark);
+  color: var(--lk-primary);
   white-space: nowrap;
 }
 
@@ -679,7 +705,7 @@ table.lk-table {
 }
 
 .lk-pill.neutral {
-  background: #f1eef5;
+  background: #eef0f4;
   color: var(--lk-slate);
 }
 
@@ -705,7 +731,7 @@ table.lk-table {
 
 .lk-icon-btn.link:hover {
   border-color: var(--lk-primary);
-  color: var(--lk-primary-dark);
+  color: var(--lk-primary);
   background: var(--lk-primary-tint);
 }
 
@@ -766,7 +792,7 @@ table.lk-table {
 .lk-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(28, 18, 41, 0.45);
+  background: rgba(20, 33, 61, 0.45);
   backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
@@ -870,8 +896,9 @@ table.lk-table {
 }
 
 .lk-tab.active {
-  color: var(--lk-primary-dark);
+  color: var(--lk-primary);
   background: var(--lk-primary-tint);
+  box-shadow: inset 0 -2px 0 var(--lk-accent);
 }
 
 .lk-cat-grid {
@@ -922,7 +949,7 @@ table.lk-table {
 }
 
 .lk-cat-card.selected {
-  border-color: var(--lk-primary);
+  border-color: var(--lk-accent);
   box-shadow: var(--lk-shadow-md);
 }
 
@@ -955,7 +982,7 @@ table.lk-table {
 }
 
 .lk-btn--primary:hover {
-  filter: brightness(1.05);
+  filter: brightness(1.15);
 }
 
 .lk-btn--primary:disabled {
@@ -1002,36 +1029,60 @@ table.lk-table {
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* ---------- Stat card additions: badge + sparkline ---------- */
-
-.lk-stat-card::before {
-  display: none;
-  /* replaces the old top gradient bar */
+.lk-input:focus {
+  outline: none;
+  border-color: var(--lk-primary-light);
+  box-shadow: 0 0 0 3px var(--lk-primary-tint);
+  background: #fff;
 }
 
-.lk-stat-badge {
-  font-size: 11px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
+.lk-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%235c6478'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 34px;
 }
 
-.lk-stat-badge.up {
-  background: var(--lk-success-tint);
-  color: var(--lk-success);
+.lk-file-input {
+  font-size: 13px;
+  color: var(--lk-slate);
 }
 
-.lk-stat-badge.down {
-  background: var(--lk-danger-tint);
-  color: var(--lk-danger);
+.lk-file-input::file-selector-button {
+  padding: 7px 13px;
+  border-radius: 8px;
+  border: 1px solid var(--lk-border);
+  background: #fff;
+  color: var(--lk-ink);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: border-color 0.15s ease;
 }
 
-.lk-stat-spark {
-  margin-top: 12px;
-  display: block;
+.lk-file-input::file-selector-button:hover {
+  border-color: var(--lk-primary-light);
+}
+
+/* wider modal for forms with more fields */
+.lk-modal:has(.lk-form) {
+  max-width: 440px;
+}
+
+/* ---------- Additions: subcategory panel (fetched live via /categories?category_id=) ---------- */
+
+.lk-subpanel__body {
+  padding: 4px 0 4px;
+}
+
+.lk-subpanel .lk-state {
+  padding: 40px 24px;
+}
+
+.lk-subpanel .lk-error-banner {
+  margin: 16px 22px 0;
 }
 
 /* ---------- Hero banner ---------- */
@@ -1040,7 +1091,7 @@ table.lk-table {
   position: relative;
   overflow: hidden;
   border-radius: var(--lk-radius-lg);
-  background: linear-gradient(120deg, #efe0fa 0%, #f4ebfb 55%, #eef1fb 100%);
+  background: linear-gradient(120deg, #e7eaf3 0%, #eef1f8 55%, #f4f6fa 100%);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1056,8 +1107,9 @@ table.lk-table {
   max-width: 440px;
 }
 
+/* only accent spot #1: the highlighted word in the hero headline */
 .lk-hero__text h2 span {
-  color: var(--lk-primary);
+  color: var(--lk-accent);
 }
 
 .lk-hero__text p {
@@ -1090,7 +1142,7 @@ table.lk-table {
   border-radius: 18px;
   overflow: hidden;
   flex-shrink: 0;
-  box-shadow: 0 20px 40px -14px rgba(121, 32, 180, 0.35);
+  box-shadow: 0 20px 40px -14px rgba(20, 33, 61, 0.35);
 }
 
 .lk-hero__art img {
@@ -1150,6 +1202,7 @@ table.lk-table {
   display: block;
 }
 
+/* accent spot #2: quick-access icon badge */
 .lk-quick-card__icon {
   position: absolute;
   bottom: -18px;
@@ -1162,6 +1215,8 @@ table.lk-table {
   justify-content: center;
   border: 3px solid #fff;
   box-shadow: var(--lk-shadow-sm);
+  background: var(--lk-accent);
+  color: #fff;
 }
 
 .lk-quick-card__body {
@@ -1197,66 +1252,6 @@ table.lk-table {
   .lk-hero__art {
     width: 100%;
   }
-}
-
-.lk-input:focus {
-  outline: none;
-  border-color: var(--lk-primary-light);
-  box-shadow: 0 0 0 3px rgba(155, 32, 208, 0.12);
-  background: #fff;
-}
-
-.lk-select {
-  appearance: none;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%236e6480'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-  padding-right: 34px;
-}
-
-.lk-file-input {
-  font-size: 13px;
-  color: var(--lk-slate);
-}
-
-.lk-file-input::file-selector-button {
-  padding: 7px 13px;
-  border-radius: 8px;
-  border: 1px solid var(--lk-border);
-  background: #fff;
-  color: var(--lk-ink);
-  font-size: 12.5px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-right: 10px;
-  transition: border-color 0.15s ease;
-}
-
-.lk-file-input::file-selector-button:hover {
-  border-color: var(--lk-primary-light);
-}
-
-/* wider modal for forms with more fields */
-.lk-modal:has(.lk-form) {
-  max-width: 440px;
-}
-
-/* ---------- Additions: subcategory panel (fetched live via /categories?category_id=) ---------- */
-
-/* Body wrapper inside the subpanel so its own loader/error/empty states
-   don't sit flush against the panel header */
-.lk-subpanel__body {
-  padding: 4px 0 4px;
-}
-
-/* Compact the generic state block (loader / empty state) when it's used
-   inside the subpanel, so it doesn't feel as tall as the full-page ones */
-.lk-subpanel .lk-state {
-  padding: 40px 24px;
-}
-
-.lk-subpanel .lk-error-banner {
-  margin: 16px 22px 0;
 }
 
 @media (max-width: 900px) {
@@ -1305,7 +1300,7 @@ table.lk-table {
   }
 }
 
-@media (max-width : 325px) {
+@media (max-width: 325px) {
   .lk-stats-grid {
     grid-template-columns: 1fr;
     gap: 6px;

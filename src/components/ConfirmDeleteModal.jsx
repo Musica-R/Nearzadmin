@@ -9,7 +9,7 @@ export default function ConfirmDeleteModal({ open, title, description, busy, onC
           <AlertTriangle size={22} />
         </div>
         <h3>{title || "Delete this entry?"}</h3>
-        <p>{description || "This action can't be undone. The listing will be permanently removed from Lokal."}</p>
+        <p>{description || "This action can't be undone. The listing will be permanently removed from Thozhaa."}</p>
         <div className="lk-modal__actions">
           <button className="lk-btn ghost" onClick={onCancel} disabled={busy}>
             Cancel

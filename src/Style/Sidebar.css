@@ -15,26 +15,26 @@
   transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Animated gradient base layer */
+/* Animated gradient base layer — navy now */
 .sbx-sidebar::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -2;
-  background: linear-gradient(160deg, #2a1240 0%, #4c1789 28%, #7920b4 55%, #9b20d0 78%, #b62be0 100%);
+  background: linear-gradient(160deg, #060a14 0%, #0d1826 28%, #14213d 55%, #1f3057 78%, #2a3b64 100%);
   background-size: 180% 180%;
   animation: sbx-drift 16s ease-in-out infinite;
 }
 
-/* Subtle frosted noise/sheen layer */
+/* Subtle frosted noise/sheen layer — one faint orange glow kept for warmth */
 .sbx-sidebar::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
   background:
-    radial-gradient(circle at 18% 8%, rgba(255, 255, 255, 0.16), transparent 42%),
-    radial-gradient(circle at 90% 85%, rgba(192, 45, 229, 0.35), transparent 55%);
+    radial-gradient(circle at 18% 8%, rgba(255, 255, 255, 0.14), transparent 42%),
+    radial-gradient(circle at 90% 85%, rgba(255, 107, 53, 0.18), transparent 55%);
   backdrop-filter: blur(40px);
 }
 
@@ -71,7 +71,7 @@
   font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.01em;
-  background: linear-gradient(90deg, #ffffff, #e9d5ff);
+  background: linear-gradient(90deg, #ffffff, #cdd6ea);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -148,13 +148,14 @@
 }
 
 .sbx-navitem.active {
-  background: rgba(255, 255, 255, 0.16);
-  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.24);
   color: #fff;
-  box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.18);
   backdrop-filter: blur(6px);
 }
 
+/* accent: active-item indicator bar is the orange touch in the sidebar */
 .sbx-navitem.active::before {
   content: "";
   position: absolute;
@@ -164,7 +165,7 @@
   width: 4px;
   height: 22px;
   border-radius: 0 4px 4px 0;
-  background: linear-gradient(180deg, #f0d9ff, #c02de5);
+  background: linear-gradient(180deg, #ff8c5f, #ff6b35);
 }
 
 .sbx-navitem__count {
@@ -178,7 +179,7 @@
 }
 
 .sbx-navitem.active .sbx-navitem__count {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.28);
 }
 
 /* ---------- User + logout ---------- */
@@ -213,7 +214,7 @@
   font-size: 13px;
   font-family: "Sora", sans-serif;
   color: #fff;
-  background: linear-gradient(145deg, #c02de5, #7920b4);
+  background: linear-gradient(145deg, #2a3b64, #0d1826);
   box-shadow: 0 4px 12px -3px rgba(0, 0, 0, 0.4);
 }
 

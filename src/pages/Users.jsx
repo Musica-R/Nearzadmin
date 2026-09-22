@@ -45,7 +45,7 @@ export default function Users({ onMenu }) {
     <>
       <Topbar
         title="Users"
-        subtitle="Everyone registered on the Lokal app"
+        subtitle="Everyone registered on the Thozhaa app"
         onMenu={onMenu}
         onRefresh={() => load(true)}
         refreshing={refreshing}

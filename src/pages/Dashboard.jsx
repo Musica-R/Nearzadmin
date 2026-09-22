@@ -193,7 +193,7 @@ export default function Dashboard({ onMenu }) {
     <>
       <Topbar
         title="Dashboard"
-        subtitle="A live snapshot of everything happening on Lokal"
+        subtitle="A live snapshot of everything happening on Thozhaa"
         onMenu={onMenu}
         onRefresh={() => load(true)}
         refreshing={refreshing}
@@ -217,7 +217,7 @@ export default function Dashboard({ onMenu }) {
                   Empowering Local Services Connecting <span>Communities</span>
                 </h2>
                 <p>
-                  Lokal helps you discover trusted local services, activities,
+                  Thozhaa helps you discover trusted local services, activities,
                   and nearby stalls — all in one place.
                 </p>
                 <Link to="/vendors" className="lk-hero__btn">

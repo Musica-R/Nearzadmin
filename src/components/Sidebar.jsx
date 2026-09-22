@@ -53,7 +53,7 @@ export default function Sidebar({ open, onClose, counts }) {
           <circle cx="18" cy="15" r="5.4" fill="#fff" />
         </svg>
         <div className="sbx-brand__text">
-          <strong>Lokal</strong>
+          <strong>Thozhaa</strong>
           <span>Admin Panel</span>
         </div>
         <button className="sbx-close" onClick={onClose} aria-label="Close menu">
@@ -97,7 +97,7 @@ export default function Sidebar({ open, onClose, counts }) {
         </button>
       </div>
 
-      <div className="sbx-foot">Lokal &middot; Tamil Nadu local services</div>
+      <div className="sbx-foot">Thozhaa &middot; Tamil Nadu local services</div>
     </aside>
   );
 }

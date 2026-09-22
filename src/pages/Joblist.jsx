@@ -893,7 +893,7 @@ export default function JobList({ onMenu }) {
         open={!!target}
         busy={busy}
         title="Delete this job listing?"
-        description={target ? `"${target.job_title}" at ${target.company_name} will be permanently removed from Lokal. This can't be undone.` : ""}
+        description={target ? `"${target.job_title}" at ${target.company_name} will be permanently removed from Thozhaa. This can't be undone.` : ""}
         onCancel={() => !busy && setTarget(null)}
         onConfirm={confirmDelete}
       />

@@ -792,7 +792,7 @@ export default function Vendors({ onMenu }) {
         title="Delete this vendor?"
         description={
           target
-            ? `"${target.business_name || target.full_name}" will be permanently removed from Lokal. This can't be undone.`
+            ? `"${target.business_name || target.full_name}" will be permanently removed from Thozhaa. This can't be undone.`
             : ""
         }
         onCancel={() => !busy && setTarget(null)}

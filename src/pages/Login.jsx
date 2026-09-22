@@ -31,18 +31,18 @@ export default function Login() {
           <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" width="40" height="40">
             <defs>
               <linearGradient id="lkPinGrad2" x1="4" y1="2" x2="32" y2="34" gradientUnits="userSpaceOnUse">
-                <stop offset="0" stopColor="#7920b4" />
-                <stop offset="0.5" stopColor="#9b20d0" />
-                <stop offset="1" stopColor="#c02de5" />
+                <stop offset="0" stopColor="#0d1826" />
+                <stop offset="0.5" stopColor="#14213d" />
+                <stop offset="1" stopColor="#2a3b64" />
               </linearGradient>
             </defs>
             <path
               d="M18 2C10.8 2 5 7.8 5 15c0 9.5 11.4 18 12.3 18.6a1.2 1.2 0 0 0 1.4 0C19.6 33 31 24.5 31 15c0-7.2-5.8-13-13-13Z"
               fill="url(#lkPinGrad2)"
             />
-            <circle cx="18" cy="15" r="5.4" fill="#fff" />
+            <circle cx="18" cy="15" r="5.4" fill="#ff6b35" />
           </svg>
-          <h1>Lokal Admin</h1>
+          <h1>Thozhaa Admin</h1>
           <p>Sign in to manage the platform</p>
         </div>
 
@@ -53,7 +53,7 @@ export default function Login() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@lokal.com"
+              placeholder="admin@Thozhaa.com"
               required
             />
           </label>
