@@ -18,6 +18,7 @@ function AdminLayout({ children, onMenu }) {
   const closeMenu = () => setMenuOpen(false);
   const openMenu = () => setMenuOpen(true);
 
+  
   return (
     <div className="lk-app">
       <Sidebar open={menuOpen} onClose={closeMenu} />

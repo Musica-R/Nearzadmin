@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   CheckCircle2,
   Check,
@@ -29,6 +29,7 @@ import {
   Users,
 } from "lucide-react";
 import api from "../api/client";
+import { useAuth } from "../context/AuthContext";
 import "../Style/AddVendor.css";
 
 const TABS = [
@@ -39,6 +40,91 @@ const TABS = [
 ];
 
 const ACTIVITY_TYPES = ["Learning & Training", "Sports & Fitness"];
+
+/* ---------------------------------------------------------------
+   Which form(s) to show comes from the logged-in user's `type`
+   (saved in localStorage as "thozhaa_user" / "lk_admin" at login),
+   e.g. type: ["Home Services", "Activity"]
+     Home Services -> Service Vendor form
+     Activity      -> Activity Provider form
+     jobs          -> Post a Job form
+     nearbystall   -> Nearby Stall form
+   Type names are matched loosely (case / spaces / symbols ignored).
+=================================================================== */
+const TYPE_TO_TAB = {
+  homeservices: "service",
+  activity: "activity",
+  activities: "activity",
+  learningtraining: "activity",
+  sportsfitness: "activity",
+  jobs: "job",
+  job: "job",
+  nearbystall: "stall",
+  nearbystalls: "stall",
+  nearstalls: "stall",
+  stall: "stall",
+  stalls: "stall",
+};
+
+// The type name sent to the backend for each form
+const TAB_API_TYPE = {
+  service: "Home Services",
+  activity: "Activity",
+  job: "jobs",
+  stall: "nearbystall",
+};
+
+// user.type can be an array, a JSON string, or "A|B" / "A,B"
+const normalizeTypes = (raw) => {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw.map((t) => String(t).trim()).filter(Boolean);
+  const text = String(raw).trim();
+  if (text.startsWith("[")) {
+    try {
+      return normalizeTypes(JSON.parse(text));
+    } catch {
+      /* fall through to the plain split */
+    }
+  }
+  return text
+    .split(/[|,]/)
+    .map((t) => t.trim())
+    .filter(Boolean);
+};
+
+const readStoredUser = () => {
+  try {
+    return (
+      JSON.parse(localStorage.getItem("thozhaa_user") || "null") ||
+      JSON.parse(localStorage.getItem("lk_admin") || "null")
+    );
+  } catch {
+    return null;
+  }
+};
+
+// Logged-in user's id: prefer the live auth user, fall back to localStorage ("thozhaa_user")
+const getUserId = (authUser) => {
+  const u = authUser || readStoredUser();
+  const id = u?.id ?? u?.user_id;
+  return id != null && id !== "" ? id : null;
+};
+
+const tabKeysForTypes = (types) => {
+  const keys = new Set();
+  types.forEach((t) => {
+    const key = TYPE_TO_TAB[String(t).toLowerCase().replace(/[^a-z0-9]/g, "")];
+    if (key) keys.add(key);
+  });
+  return keys;
+};
+
+// No (known) type -> show every tab, so the page never ends up empty
+const tabsForTypes = (types) => {
+  const keys = tabKeysForTypes(types);
+  const tabs = TABS.filter((t) => keys.has(t.key));
+  return tabs.length ? tabs : TABS;
+};
 
 const HERO_COPY = {
   service: {
@@ -162,7 +248,14 @@ const FileField = ({ label, name, file, onChange, required, small }) => (
 );
 
 export default function AddVendor({ onMenu }) {
-  const [form, setForm] = useState(initialState);
+  // Logged-in user (id + type) — from AuthContext, falling back to localStorage
+  const { admin } = useAuth();
+  const currentUser = admin || readStoredUser();
+
+  const allowedTypes = useMemo(() => normalizeTypes(currentUser?.type), [currentUser]);
+  const visibleTabs = useMemo(() => tabsForTypes(allowedTypes), [allowedTypes]);
+
+  const [form, setForm] = useState(() => ({ ...initialState, type: visibleTabs[0].key }));
   const [categories, setCategories] = useState([]);
   const [cities, setCities] = useState([]);
   const [activityCategories, setActivityCategories] = useState([]);
@@ -182,10 +275,17 @@ export default function AddVendor({ onMenu }) {
       .catch(() => setCities([]));
   }, []);
 
+  // If the allowed tabs change (e.g. user switched), make sure the active tab is valid
+  useEffect(() => {
+    if (!visibleTabs.some((t) => t.key === form.type)) {
+      setForm((prev) => ({ ...initialState, type: visibleTabs[0].key, city_id: prev.city_id }));
+    }
+  }, [visibleTabs, form.type]);
+
   const homeServiceCategories = categories.filter((c) => c.type === "Home Services");
 
   const resetAll = () => {
-    setForm(initialState);
+    setForm({ ...initialState, type: visibleTabs[0].key });
     setActivityCategories([]);
     setSuccess(false);
     setError(null);
@@ -272,6 +372,12 @@ export default function AddVendor({ onMenu }) {
 
   const buildFormData = () => {
     const fd = new FormData();
+
+    // Logged-in user's id (from localStorage) goes with ALL four forms
+    // (service / activity / stall / job), plus the type of the form being submitted.
+    fd.append("user_id", getUserId(admin));
+    fd.append("type", TAB_API_TYPE[form.type]);
+
     // Admin-created listings are always tagged role="admin" (backend accepts vendor|admin).
     fd.append("role", "admin");
 
@@ -366,8 +472,14 @@ export default function AddVendor({ onMenu }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
+
+    if (getUserId(admin) == null) {
+      setError("Could not find your user id. Please log out and log in again.");
+      return;
+    }
+
+    setLoading(true);
     try {
       await api.registerVendor(form.type, buildFormData());
       setSuccess(true);
@@ -399,21 +511,23 @@ export default function AddVendor({ onMenu }) {
         </div>
       </div>
 
-      <div className="av-tabs" role="tablist">
-        {TABS.map(({ key, label, icon: Icon }) => (
-          <button
-            key={key}
-            type="button"
-            role="tab"
-            aria-selected={form.type === key}
-            className={`av-tab ${form.type === key ? "active" : ""}`}
-            onClick={() => handleTypeChange(key)}
-          >
-            <Icon size={16} />
-            <span>{label}</span>
-          </button>
-        ))}
-      </div>
+      {visibleTabs.length > 1 && (
+        <div className="av-tabs" role="tablist">
+          {visibleTabs.map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              type="button"
+              role="tab"
+              aria-selected={form.type === key}
+              className={`av-tab ${form.type === key ? "active" : ""}`}
+              onClick={() => handleTypeChange(key)}
+            >
+              <Icon size={16} />
+              <span>{label}</span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {success ? (
         <div className="av-card av-success">

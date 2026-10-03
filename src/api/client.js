@@ -31,7 +31,7 @@ const REGISTER_ENDPOINTS = {
 
 export const api = {
   adminLogin: ({ email, password }) =>
-    request("/admin/login", { method: "POST", body: toForm({ email, password }) }),
+    request("/login", { method: "POST", body: toForm({ email, password }) }),
 
   dashboardCounts: () => request("/dashboard-list"),
 
@@ -44,11 +44,11 @@ export const api = {
 
   jobs: ({ page } = {}) => request(`/jobs${page ? `?page=${page}` : ""}`),
 
-updateJob: (id, payload) =>
-  request(`/jobs/update/${id}`, { method: "POST", body: toForm(payload) }),
+  updateJob: (id, payload) =>
+    request(`/jobs/update/${id}`, { method: "POST", body: toForm(payload) }),
 
-deleteJob: (id) =>
-  request(`/jobs/delete/${id}`, { method: "GET" }),
+  deleteJob: (id) =>
+    request(`/jobs/delete/${id}`, { method: "GET" }),
 
   // type: "service" | "activity" | "stall" — routes to the matching endpoint.
   registerVendor: (type, formData) =>
